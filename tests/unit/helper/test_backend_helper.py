@@ -137,8 +137,12 @@ class BackendHelperTestCase(unittest.TestCase):
                    'web-c': {'force_ssl': ''},
                    'web-d': {}}
 
-        self.assertEqual(["redirect scheme https code 301 if !{ ssl_fc }"], get_force_ssl_setting(details, 'web-a'))
-        self.assertEqual(["redirect scheme https code 301 if !{ ssl_fc }"], get_force_ssl_setting(details, 'web-b'))
+        self.assertEqual(["acl is_forwarded_ssl req.hdr(X-Forwarded-Proto) https",
+                          "redirect scheme https code 301 if !{ ssl_fc } !is_forwarded_ssl"],
+                         get_force_ssl_setting(details, 'web-a'))
+        self.assertEqual(["acl is_forwarded_ssl req.hdr(X-Forwarded-Proto) https",
+                          "redirect scheme https code 301 if !{ ssl_fc } !is_forwarded_ssl"],
+                         get_force_ssl_setting(details, 'web-b'))
         self.assertEqual([], get_force_ssl_setting(details, 'web-c'))
         self.assertEqual([], get_force_ssl_setting(details, 'web-d'))
         self.assertEqual([], get_force_ssl_setting(details, 'web-e'))
