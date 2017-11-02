@@ -112,7 +112,8 @@ def get_force_ssl_setting(details, service_alias):
     setting = []
     force_ssl = get_service_attribute(details, "force_ssl", service_alias)
     if force_ssl:
-        setting.append("redirect scheme https code 301 if !{ ssl_fc }")
+        setting.append("acl is_forwarded_ssl req.hdr(X-Forwarded-Proto) https")
+        setting.append("redirect scheme https code 301 if !{ ssl_fc } !is_forwarded_ssl")
     return setting
 
 
